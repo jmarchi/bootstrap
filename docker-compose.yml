@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: web
+    build:
+      context: web
+      dockerfile: dev.Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web/src:/app/src
+      - ./web/public:/app/public
+    command: "yarn run dev"
+
+  server:
+    container_name: server
+    build:
+      context: ./server
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./server/src:/app/src
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - mongo
+    command: "yarn run start:dev"
+
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
